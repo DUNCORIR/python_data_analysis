@@ -1,20 +1,24 @@
-# COVID-19 Global Data Tracker Project
+"""
+COVID-19 Global Data Tracker
+This script performs data loading, cleaning, analysis, and visualization
+for tracking COVID-19 cases, deaths, and vaccination progress globally.
+"""
 
-#  Import Libraries
+# 📦 Import Libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 
-# Load Dataset (use your own filename: datasets.csv or COVID-19.csv)
+# 📥 Load Dataset (use your own filename: datasets.csv or COVID-19.csv)
 df = pd.read_csv('datasets.csv')  # or 'COVID-19.csv'
 
-# Data Exploration
+# 📊 Data Exploration
 print("\nData Columns:\n", df.columns)
 print("\nData Preview:\n", df.head())
 print("\nMissing Values Summary:\n", df.isnull().sum())
 
-#  Data Cleaning
+# 🧹 Data Cleaning
 countries_of_interest = ['Kenya', 'USA', 'India']
 df_filtered = df[df['location'].isin(countries_of_interest)]
 df_filtered = df_filtered.dropna(subset=['date', 'total_cases', 'total_deaths', 'total_vaccinations'])
@@ -23,7 +27,7 @@ df_filtered['total_cases'] = df_filtered['total_cases'].interpolate()
 df_filtered['total_deaths'] = df_filtered['total_deaths'].interpolate()
 df_cleaned = df_filtered.copy()
 
-# Total Cases Over Time
+# 📈 Total Cases Over Time
 plt.figure(figsize=(10, 6))
 for country in countries_of_interest:
     country_data = df_cleaned[df_cleaned['location'] == country]
@@ -33,9 +37,11 @@ plt.xlabel('Date')
 plt.ylabel('Total Cases')
 plt.legend()
 plt.grid(True)
+plt.tight_layout()
+plt.savefig('images/total_cases_over_time.png')
 plt.show()
 
-# Total Deaths Over Time
+# 📈 Total Deaths Over Time
 plt.figure(figsize=(10, 6))
 for country in countries_of_interest:
     country_data = df_cleaned[df_cleaned['location'] == country]
@@ -45,13 +51,15 @@ plt.xlabel('Date')
 plt.ylabel('Total Deaths')
 plt.legend()
 plt.grid(True)
+plt.tight_layout()
+plt.savefig('images/total_deaths_over_time.png')
 plt.show()
 
-# Calculate Death Rate
+# 📉 Calculate Death Rate
 df_cleaned['death_rate'] = df_cleaned['total_deaths'] / df_cleaned['total_cases']
 print("\nDeath Rate Sample:\n", df_cleaned[['location', 'date', 'death_rate']].head())
 
-# Vaccination Progress
+# 💉 Vaccination Progress
 plt.figure(figsize=(10, 6))
 for country in countries_of_interest:
     country_data = df_cleaned[df_cleaned['location'] == country]
@@ -61,14 +69,16 @@ plt.xlabel('Date')
 plt.ylabel('Total Vaccinations')
 plt.legend()
 plt.grid(True)
+plt.tight_layout()
+plt.savefig('images/total_vaccinations_over_time.png')
 plt.show()
 
-# Vaccination Rate (% of population)
+# 💉 Vaccination Rate (% of population)
 if 'population' in df_cleaned.columns:
     df_cleaned['vaccination_rate'] = df_cleaned['total_vaccinations'] / df_cleaned['population'] * 100
     print("\nVaccination Rate Sample:\n", df_cleaned[['location', 'date', 'vaccination_rate']].head())
 
-# Optional Choropleth Map (requires iso_code and latest total_cases)
+# 🌍 Optional Choropleth Map (requires iso_code and latest total_cases)
 latest_date = df_cleaned['date'].max()
 latest_data = df_cleaned[df_cleaned['date'] == latest_date][['iso_code', 'location', 'total_cases']]
 fig = px.choropleth(latest_data,
@@ -79,8 +89,8 @@ fig = px.choropleth(latest_data,
                     title=f"COVID-19 Total Cases by Country on {latest_date.date()}")
 fig.show()
 
-# - Sample Insights (use Markdown in notebook for these)
-# - India shows the highest total cases among the selected countries.
-# - Kenya's vaccination rate increased steadily but remained lower compared to USA.
-# - Death rates fluctuated over time and correlated with major waves.
-# - The USA had the earliest and largest spike in total deaths.
+# 📝 Example Insights
+print("\nSample Insights:")
+print("1. India has the highest total cases among the selected countries.")
+print("2. Kenya's vaccination rate increased steadily but remains lower compared to the USA.")
+print("3. Death rates peaked alongside major case waves in the USA.")
